@@ -1,3 +1,5 @@
+==> Assignment 4 <==
+
 [root@ip-172-31-29-159 k8s-specifications]# kubectl apply -f .
 deployment.apps/db created
 service/db created
