@@ -1,0 +1,4 @@
+==> ASSIGNMENT 1 <==
+In case of single copy of pod we should use daemonSet instead of RS,
+so that the pods can be garbage collected when we delete the daemonSet and no new pod is created.
+If we want single instance of pod on all nodes hence we go for daemonSet.
