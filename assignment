@@ -1,0 +1,100 @@
+[root@ip-172-31-29-159 k8s-specifications]# kubectl apply -f .
+deployment.apps/db created
+service/db created
+deployment.apps/redis created
+service/redis created
+deployment.apps/result created
+service/result created
+deployment.apps/vote created
+service/vote created
+deployment.apps/worker created
+
+==========================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-qbv7d        2/2     Running   0          12m
+redis-868d64d78-tslvc     2/2     Running   0          12m
+result-5d57b59f4b-8vmfb   2/2     Running   0          12m
+vote-94849dc97-4jlsw      2/2     Running   0          12m
+worker-dd46d7584-zqwjp    2/2     Running   0          12m
+
+============================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+db           ClusterIP   10.98.232.28     <none>        5432/TCP         39s
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          3m4s
+redis        ClusterIP   10.96.175.196    <none>        6379/TCP         39s
+result       NodePort    10.105.126.182   <none>        5001:31001/TCP   38s
+vote         NodePort    10.105.79.139    <none>        5000:31000/TCP   38s
+
+==============================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl delete po vote-94849dc97-d2fm5
+pod "vote-94849dc97-d2fm5" deleted
+
+==============================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-qbv7d        2/2     Running   0          34m
+redis-868d64d78-tslvc     2/2     Running   0          34m
+result-5d57b59f4b-8vmfb   2/2     Running   0          34m
+vote-94849dc97-kfvn8      2/2     Running   0          31s
+worker-dd46d7584-zqwjp    2/2     Running   0          34m
+
+===============================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl delete po result-5d57b59f4b-8vmfb
+pod "result-5d57b59f4b-8vmfb" deleted
+
+===============================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-qbv7d        2/2     Running   0          38m
+redis-868d64d78-tslvc     2/2     Running   0          38m
+result-5d57b59f4b-v2x59   2/2     Running   0          64s
+vote-94849dc97-kfvn8      2/2     Running   0          4m37s
+worker-dd46d7584-zqwjp    2/2     Running   0          38m
+
+===============================================================================
+
+=> Observation : Though we delete vote pod or result pod it create another vote pod, result pod and it doesn't affect on results as db pod store all the results.
+
+================================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl delete po db-b54cd94f4-qbv7d
+pod "db-b54cd94f4-qbv7d" deleted
+
+================================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-9h99t        2/2     Running   0          27s
+redis-868d64d78-tslvc     2/2     Running   0          41m
+result-5d57b59f4b-v2x59   2/2     Running   0          4m1s
+vote-94849dc97-kfvn8      2/2     Running   0          7m34s
+worker-dd46d7584-k2v4q    2/2     Running   1          2m40s
+
+================================================================================
+
+=>Obsevation : After deleting db pod we loss our old data and though it create new db pod it doesn't work with current result pod.
+               So in order to get results we have to again delete result pod and restart it, now both new db and result pod works fine.
+
+================================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl delete po result-5d57b59f4b-v2x59
+pod "result-5d57b59f4b-v2x59" deleted
+
+================================================================================
+
+[root@ip-172-31-29-159 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-9h99t        2/2     Running   0          5m41s
+redis-868d64d78-tslvc     2/2     Running   0          47m
+result-5d57b59f4b-9s6gz   2/2     Running   0          2m18s
+vote-94849dc97-kfvn8      2/2     Running   0          12m
+worker-dd46d7584-k2v4q    2/2     Running   1          7m54s
+
